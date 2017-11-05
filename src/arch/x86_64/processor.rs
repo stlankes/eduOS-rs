@@ -266,6 +266,34 @@ const EFER_LMSLE : u32 = (1 << 13);
 const EFER_FFXSR : u32 = (1 << 14);
 const EFER_TCE : u32 = (1 << 15);
 
+/// Search the first most significant bit
+#[inline(always)]
+pub fn msb(i: u64) -> u64 {
+	let ret: u64;
+
+	if i == 0 {
+		ret = !0;
+	} else {
+		unsafe { asm!("bsr $1, $0" : "=r"(ret) : "r"(i) : "cc" : "volatile"); }
+	}
+
+	ret
+}
+
+/// Search the least significant bit
+#[inline(always)]
+pub fn lsb(i: u64) -> u64 {
+	let ret: u64;
+
+	if i == 0 {
+		ret = !0;
+	} else {
+		unsafe { asm!("bsf $1, $0" : "=r"(ret) : "r"(i) : "cc" : "volatile"); }
+	}
+
+	ret
+}
+
 pub fn halt() {
 	loop {
 		unsafe {
