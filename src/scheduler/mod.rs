@@ -62,3 +62,9 @@ pub fn do_exit() {
 pub fn get_current_taskid() -> task::TaskId {
 	unsafe { SCHEDULER.get_current_taskid() }
 }
+
+/// Get the Priority of the current running task
+#[inline(always)]
+pub fn get_current_priority() -> u8 {
+	unsafe { SCHEDULER.get_current_priority() }
+}

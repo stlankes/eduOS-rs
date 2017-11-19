@@ -83,7 +83,7 @@ impl Scheduler {
 		let tid = self.get_tid();
 
 		// boot task is implicitly task 0 and and the idle task of core 0
-		let idle_box = Box::new(Task::new(tid, TaskStatus::TaskIdle, LOW_PRIO));
+		let idle_box = Box::new(Task::new(tid, TaskStatus::TaskIdle, LOW_PRIO, 8));
 		let bottom = (*idle_box.stack).bottom();
 		let idle_shared = Shared::new_unchecked(Box::into_raw(idle_box));
 
@@ -98,7 +98,7 @@ impl Scheduler {
 
 	pub unsafe fn spawn(&mut self, func: extern fn(), prio: Priority) -> TaskId {
 		let id = self.get_tid();
-		let mut task = Box::new(Task::new(id, TaskStatus::TaskReady, prio));
+		let mut task = Box::new(Task::new(id, TaskStatus::TaskReady, prio, 8));
 
 		task.create_stack_frame(func);
 
@@ -106,7 +106,7 @@ impl Scheduler {
 		self.ready_queue.push(prio, shared_task);
 		self.tasks.as_mut().unwrap().insert(id, *shared_task);
 
-		info!("create task with id {}", id);
+		info!("create task with id {} and priority {}", id, prio);
 
 		id
 	}
@@ -125,6 +125,11 @@ impl Scheduler {
 	#[inline(always)]
 	pub fn get_current_taskid(&self) -> TaskId {
 		unsafe { self.current_task.as_ref().id }
+	}
+
+	#[inline(always)]
+	pub fn get_current_priority(&self) -> u8 {
+		unsafe { self.current_task.as_ref().prio.into() }
 	}
 
 	#[inline(always)]
@@ -175,6 +180,10 @@ impl Scheduler {
 
 				if self.current_task.as_ref().status == TaskStatus::TaskRunning {
 					self.current_task.as_mut().status = TaskStatus::TaskReady;
+					// calculate new penalty
+					self.current_task.as_mut().penalty = self.current_task.as_mut().penalty + 8;
+					// TODO: update prio of other tasks
+
 					self.ready_queue.push(self.current_task.as_ref().prio,
 						&mut self.current_task);
 				} else if self.current_task.as_ref().status == TaskStatus::TaskFinished {
@@ -187,6 +196,8 @@ impl Scheduler {
 
 				let next_stack_pointer = next_task.as_ref().last_stack_pointer;
 				let old_stack_pointer = &self.current_task.as_ref().last_stack_pointer as *const u64;
+
+
 
 				self.current_task = next_task;
 

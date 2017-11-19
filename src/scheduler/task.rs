@@ -225,7 +225,7 @@ impl PriorityTaskQueue {
 		}
 	}
 
-	/// Pop the next task, which has a higher or the same proority like `prio`
+	/// Pop the next task, which has a higher or the same priority like `prio`
 	pub fn pop_with_prio(&mut self, prio: Priority) -> Option<Shared<Task>> {
 		let i = lsb(self.prio_bitmap);
 
@@ -252,6 +252,10 @@ pub struct Task {
 	pub status: TaskStatus,
 	/// Task priority,
 	pub prio: Priority,
+	/// Task base priority before penalty
+	pub base_prio: Priority,
+	/// Penalty
+	pub penalty: u8,
 	/// Last stack pointer before a context switch to another task
 	pub last_stack_pointer: u64,
 	/// points to the next task within a task queue
@@ -279,7 +283,7 @@ impl Drop for Task {
 }
 
 impl Task {
-	pub fn new(tid: TaskId, task_status: TaskStatus, task_prio: Priority) -> Task {
+	pub fn new(tid: TaskId, task_status: TaskStatus, task_prio: Priority, penalty: u8) -> Task {
 		let tmp = unsafe { Heap.alloc(Layout::new::<KernelStack>()).unwrap() as *mut KernelStack };
 
 		debug!("allocate stack for task {} at 0x{:x}", tid, tmp as usize);
@@ -288,6 +292,8 @@ impl Task {
 			id: tid,
 			status: task_status,
 			prio: task_prio,
+			base_prio: task_prio,
+			penalty: penalty,
 			last_stack_pointer: 0,
 			next: None,
 			prev: None,

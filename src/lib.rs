@@ -60,7 +60,8 @@ static ALLOCATOR: allocator::Allocator = allocator::Allocator;
 
 extern "C" fn foo() {
 	for _i in 0..5 {
-		println!("hello from task {}", scheduler::get_current_taskid());
+		println!("hello from task {} with current priority {}",
+				 scheduler::get_current_taskid(), scheduler::get_current_priority());
 		scheduler::reschedule();
 	}
 }
