@@ -178,6 +178,28 @@ impl TaskQueue {
 			}
 		}
 	}
+
+	pub fn pop_pos(&mut self, u64: pos) -> Option<Shared<Task>> {
+		unsafe {
+			match self.head {
+				None => None,
+				Some(mut task) => {
+					for i in 0..pos {
+						task = task.as_mut().next;
+					}
+					/// TODO:
+					task.as_mut().next = Some()
+					match self.head {
+						None => self.tail = None,
+						Some(_i) => {}
+					}
+					Some(task)
+				}
+			}
+		}
+	}
+
+
 }
 
 /// Realize a priority queue for tasks
@@ -196,11 +218,11 @@ impl PriorityTaskQueue {
 	}
 
 	/// Add task by its priority to the queue
-	pub fn push(&mut self, prio: Priority, task: &mut Shared<Task>) {
+	pub fn push(&mut self, prio: Priority, id: TaskId, task: &mut Shared<Task>) {
 		let mut i = prio.into() as usize;
 
 		if i >= NO_PRIORITIES {
-			info!("priority with {} is too high for TaskQueue::push_back()!", prio);
+			info!("priority with {} on task {} is too high for TaskQueue::push_back()!", prio, id);
 			i = NO_PRIORITIES - 1;
 		}
 
@@ -225,6 +247,14 @@ impl PriorityTaskQueue {
 		}
 	}
 
+	pub fn pop_pos(&mut self, u8: queue, u64: pos) -> Option<Shared<Task>> {
+
+		ret = self.queues[queue as usize].pop_pos(pos);
+
+	}
+
+
+
 	/// Pop the next task, which has a higher or the same priority like `prio`
 	pub fn pop_with_prio(&mut self, prio: Priority) -> Option<Shared<Task>> {
 		let i = lsb(self.prio_bitmap);
@@ -239,6 +269,35 @@ impl PriorityTaskQueue {
 			ret
 		} else {
 			None
+		}
+	}
+
+	/// update task priorities (multi level feedback)
+	pub unsafe fn update_prios(&mut self) {
+		for x in 0..31 {
+			let mut done = false;
+			// iterate through queues
+			match self.queues[x as usize].pop_front() {
+				None => {},
+				Some(mut task) => {
+					while !done  {
+						task.as_mut().penalty = task.as_mut().penalty / 2;
+						task.as_mut().prio = Priority::from(task.as_mut().base_prio.into()
+							+ task.as_mut().penalty);
+						self.push(task.as_mut().prio, task.as_mut().id, &mut task);
+						info!("Prio queue: pos {} new prio {} task id {}", x, task.as_ref().prio, task.as_ref().id);
+						// iterate through tasks in priority queue
+						match self.queues[x as usize].pop_front() {
+							None => { done = true; },
+							Some(next) => {
+								task = next;
+								info!("neeeeeeeeeeeeeeeeeeeeeeeext");
+							}
+						}
+
+					}
+				}
+ 			}
 		}
 	}
 }

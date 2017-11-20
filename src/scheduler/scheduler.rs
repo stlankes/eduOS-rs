@@ -83,7 +83,7 @@ impl Scheduler {
 		let tid = self.get_tid();
 
 		// boot task is implicitly task 0 and and the idle task of core 0
-		let idle_box = Box::new(Task::new(tid, TaskStatus::TaskIdle, LOW_PRIO, 8));
+		let idle_box = Box::new(Task::new(tid, TaskStatus::TaskIdle, LOW_PRIO, 0));
 		let bottom = (*idle_box.stack).bottom();
 		let idle_shared = Shared::new_unchecked(Box::into_raw(idle_box));
 
@@ -98,12 +98,12 @@ impl Scheduler {
 
 	pub unsafe fn spawn(&mut self, func: extern fn(), prio: Priority) -> TaskId {
 		let id = self.get_tid();
-		let mut task = Box::new(Task::new(id, TaskStatus::TaskReady, prio, 8));
+		let mut task = Box::new(Task::new(id, TaskStatus::TaskReady, prio, 0));
 
 		task.create_stack_frame(func);
 
 		let shared_task = &mut Shared::new_unchecked(Box::into_raw(task));
-		self.ready_queue.push(prio, shared_task);
+		self.ready_queue.push(prio, id, shared_task);
 		self.tasks.as_mut().unwrap().insert(id, *shared_task);
 
 		info!("create task with id {} and priority {}", id, prio);
@@ -144,6 +144,20 @@ impl Scheduler {
 		}
 		status = self.current_task.as_ref().status;
 
+		// calculate new penalty
+		self.ready_queue.pop();
+
+		self.current_task.as_mut().penalty = self.current_task.as_mut().penalty + 2;
+		info!("Add penalty: task {} penalty {}", self.current_task.as_ref().id, self.current_task.as_ref().penalty);
+
+		self.current_task.as_mut().prio = Priority::from(self.current_task.as_mut().
+			base_prio.into() + self.current_task.as_mut().penalty);
+		info!("Update current task prio: id {} prio {}", self.current_task.as_ref().id, self.current_task.as_ref().prio);
+
+		self.ready_queue.push(prio, self.current_task.as_ref().id, &mut self.current_task);
+
+		self.ready_queue.update_prios();
+
 		match self.ready_queue.pop_with_prio(prio) {
 			Some(mut task) => {
 				task.as_mut().status = TaskStatus::TaskRunning;
@@ -180,11 +194,7 @@ impl Scheduler {
 
 				if self.current_task.as_ref().status == TaskStatus::TaskRunning {
 					self.current_task.as_mut().status = TaskStatus::TaskReady;
-					// calculate new penalty
-					self.current_task.as_mut().penalty = self.current_task.as_mut().penalty + 8;
-					// TODO: update prio of other tasks
-
-					self.ready_queue.push(self.current_task.as_ref().prio,
+					self.ready_queue.push(self.current_task.as_ref().prio, self.current_task.as_ref().id,
 						&mut self.current_task);
 				} else if self.current_task.as_ref().status == TaskStatus::TaskFinished {
 					self.current_task.as_mut().status = TaskStatus::TaskInvalid;
