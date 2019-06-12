@@ -13,6 +13,11 @@ git = "https://github.com/hermitcore/rust-x86.git"
 branch = "hermit"
 default-features = false
 
+[target.'cfg(target_arch = "aarch64")'.dependencies.aarch64]
+git = "https://github.com/Harry-R/rust-aarch64.git"
+branch = "eduos"
+default-features = false
+
 [package.metadata.cargo-xbuild]
 memcpy = true
 
@@ -22,11 +27,11 @@ output = "bootimage.bin"    # The output file name
 minimum-image-size = 0      # The minimum output file size (in MiB)
 # The command invoked on `bootimage run`
 # (the "{}" will be replaced with the path to the bootable disk image)
-run-command = ["qemu-system-x86_64", "-drive", "format=raw,file={}"]
+run-command = ["qemu-system-aarch64", "-drive", "format=raw,file={}"]
 
 [package.metadata.bootimage.bootloader]
 name = "bootloader"                 # The bootloader crate name
-target = "x86_64-bootloader.json"   # Target triple for compiling the bootloader
+target = "aarch64-bootloader.json"   # Target triple for compiling the bootloader
 
 # The development profile, used for `cargo build`.
 [profile.dev]
