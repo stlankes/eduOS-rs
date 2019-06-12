@@ -1,4 +1,4 @@
-arch ?= x86_64
+arch ?= aarch64
 target ?= $(arch)-eduos
 release ?= 0
 
@@ -35,4 +35,4 @@ docs:
 
 cargo:
 	@echo CARGO
-	@cargo xbuild $(opt) --target $(target).json
+	@cargo xbuild $(opt) --target $(target).json -v
