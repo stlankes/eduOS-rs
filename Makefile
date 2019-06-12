@@ -1,4 +1,4 @@
-arch ?= x86_64
+arch ?= aarch64
 target ?= $(arch)-eduos
 release ?=
 
