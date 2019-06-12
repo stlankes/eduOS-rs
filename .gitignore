@@ -1,3 +1,4 @@
 bootimage.bin
 target
 Cargo.lock
+.idea/
