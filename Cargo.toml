@@ -6,6 +6,7 @@ authors = ["Stefan Lankes <slankes@eonerc.rwth-aachen.de>"]
 
 [dependencies]
 spin = "0.4.9"	# Spinlocks.
+bootimage = "0.6.6"
 bootloader = "0.3.4"
 
 [target.'cfg(target_arch = "x86_64")'.dependencies.x86]
