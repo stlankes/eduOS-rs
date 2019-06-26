@@ -1,6 +1,5 @@
 use core::fmt;
 use spin::Mutex;
-use core::ptr;
 use aarch64::io::*;
 
 /// A COM serial port.
