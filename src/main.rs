@@ -8,17 +8,17 @@
 extern crate eduos_rs;
 
 use core::panic::PanicInfo;
-use eduos_rs::arch::processor::shutdown;
+// use eduos_rs::arch::processor::shutdown;
 
 /// This function is the entry point, since the linker looks for a function
 /// named `_start` by default.
 #[cfg(not(test))]
 #[no_mangle] // don't mangle the name of this function
-pub extern "C" fn _start() -> ! {
+pub extern "C" fn _start() -> () {
 	println!("Hello world!");
 
 	// shutdown system
-	shutdown();
+	// shutdown();
 }
 
 /// This function is called on panic.
