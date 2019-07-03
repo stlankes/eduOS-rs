@@ -32,7 +32,7 @@ bootimage.bin:
 fmt:
 	rustfmt --write-mode overwrite src/lib.rs
 
-qemu: bootimage.bin
+qemu: # bootimage.bin
 	@qemu-system-$(arch) -machine virt -display none -smp 1 -serial stdio -drive format=raw,file=bootimage.bin || true
 
 run:
