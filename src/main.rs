@@ -1,5 +1,6 @@
 #![feature(panic_info_message)]
 #![feature(abi_x86_interrupt)]
+#![feature(asm)]
 #![no_std] // don't link the Rust standard library
 #![cfg_attr(not(test), no_main)] // disable all Rust-level entry points
 #![cfg_attr(test, allow(dead_code, unused_macros, unused_imports))]
@@ -8,6 +9,7 @@
 extern crate eduos_rs;
 
 use core::panic::PanicInfo;
+use core::ptr;
 // use eduos_rs::arch::processor::shutdown;
 
 /// This function is the entry point, since the linker looks for a function
@@ -15,7 +17,11 @@ use core::panic::PanicInfo;
 #[cfg(not(test))]
 #[no_mangle] // don't mangle the name of this function
 pub extern "C" fn _start() -> () {
+	unsafe { asm!("ldr %x0, 0x42" :::: "volatile"); }
+	// unsafe { ptr::write_volatile(0x09000000 as *mut u8, 65); }
+	loop{};
 	println!("Hello world!");
+	// loop{};
 
 	// shutdown system
 	// shutdown();
