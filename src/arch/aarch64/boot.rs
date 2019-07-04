@@ -1,24 +1,17 @@
 #![no_std]
-// #![feature(global_asm)]
 
-/// Initializes the bss section before calling `_start()`.
+/// Some space for init stuff before calling `main()`.
 #[no_mangle]
-pub unsafe extern "C" fn reset() -> ! {
-    extern "C" {
-        // Boundaries of the .bss section, provided by the linker script
-        static mut __bss_start: u64;
-        static mut __bss_end: u64;
-    }
+pub unsafe extern "C" fn init() -> ! {
 
-    // Zeroes the .bss section
-    r0::zero_bss(&mut __bss_start, &mut __bss_end);
+    // nothing to initialize atm
 
     extern "Rust" {
-        fn _start() -> !;
+        fn main() -> !;
     }
 
-   _start();
+   main();
 }
 
-// Disable all cores except core 0, and then jump to reset()
+// Disable all cores except core 0, and then jump to init()
 global_asm!(include_str!("boot.S"));

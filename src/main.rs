@@ -12,17 +12,18 @@ use core::panic::PanicInfo;
 use core::ptr;
 // use eduos_rs::arch::processor::shutdown;
 
-/// This function is the entry point, since the linker looks for a function
-/// named `_start` by default.
+/// This is the main function called by `init()` function from boot.rs
 #[cfg(not(test))]
 #[no_mangle] // don't mangle the name of this function
-pub extern "C" fn _start() -> () {
+pub extern "C" fn main() -> () {
 	unsafe {
-		asm!("mov x0, #42" :::: "volatile");
-		asm!("mov x1, #1337" :::: "volatile");;
+		// just test code for writing registers
+		asm!("mov x1, #42" :::: "volatile");;
 		asm!("mov sp, x1" :::: "volatile")
 	;}
-	unsafe { ptr::write_volatile(0x09000000 as *mut u8, 65); }
+	// write 'A' to qemu uart
+	// TODO: Find out, why ths isn't working...
+	unsafe { ptr::write_volatile(0x09000000  as *mut u8, 65); }
 	loop{};
 	// shutdown system
 	// shutdown();
