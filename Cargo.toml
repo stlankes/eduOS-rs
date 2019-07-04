@@ -8,6 +8,7 @@ authors = ["Stefan Lankes <slankes@eonerc.rwth-aachen.de>"]
 spin = "0.4.9"	# Spinlocks.
 cortex-a = "2.3.1"
 register = "0.3.2"
+r0 = "0.2.2"
 # bootimage = "0.6.6"
 # bootloader = "0.3.4"
 

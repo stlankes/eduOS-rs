@@ -1,4 +1,4 @@
-#![feature(asm, const_fn, lang_items)]
+#![feature(asm, const_fn, lang_items, global_asm)]
 #![no_std]
 
 extern crate spin;
