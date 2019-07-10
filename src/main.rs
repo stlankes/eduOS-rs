@@ -17,13 +17,14 @@ use core::ptr;
 #[no_mangle] // don't mangle the name of this function
 pub extern "C" fn main() -> () {
 	unsafe {
-		// just test code for writing registers
-		asm!("mov x1, #42" :::: "volatile");;
-		asm!("mov sp, x1" :::: "volatile")
+		// output to uart
+		asm!{"movz x8, 0x900, lsl 16" :::: "volatile"};
+		asm!{"movz x7, 0x41" :::: "volatile"};
+		asm!{"str x7, [x8]" :::: "volatile"};
 	;}
 	// write 'A' to qemu uart
 	// TODO: Find out, why ths isn't working...
-	unsafe { ptr::write_volatile(0x09000000  as *mut u8, 65); }
+	// unsafe { ptr::write_volatile(0x09000000  as *mut u32, 65 as u32); }
 	loop{};
 	// shutdown system
 	// shutdown();
