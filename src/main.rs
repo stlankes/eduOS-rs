@@ -16,23 +16,9 @@ use core::ptr;
 #[cfg(not(test))]
 #[no_mangle] // don't mangle the name of this function
 pub extern "C" fn main() -> () {
-	unsafe {
-		// output to uart
-		asm!{"movz x8, 0x900, lsl 16" :::: "volatile"};
-		asm!{"movz x7, 0x41" :::: "volatile"};
-		asm!{"str x7, [x8]" :::: "volatile"};
-	;}
-	// write 'A' to qemu uart;
-	// TODO: Find out, why ths isn't working...
-	unsafe { ptr::write_volatile(0x09000000  as *mut u32, 67 as u32); }
-	// loop{};
-	foo();
+	loop{};
 	// shutdown system
 	// shutdown();
-}
-
-pub fn foo() {
-	loop {	}
 }
 
 /// This function is called on panic.

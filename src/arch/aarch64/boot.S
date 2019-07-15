@@ -41,11 +41,6 @@ _start:
     movz x1, 0x5000, lsl 16
     mov sp, x1
 
-    // print 'B' to virt. uart
-    movz x8, 0x900, lsl 16
-	movz x7, 0x42
-    str x7, [x8]
-
     // jump to Rust code, should not return
     b       init
     // for failsafe, halt this core too
