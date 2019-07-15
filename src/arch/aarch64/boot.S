@@ -38,8 +38,12 @@ _start:
 2:  // cpu id == 0
 
     // set stack before our code
-    ldr     x1, =_start
-    mov     sp, x1
+    mov sp, 0x40000000
+
+    // print 'B' to virt. uart
+    movz x8, 0x900, lsl 16
+	movz x7, 0x42
+    str x7, [x8]
 
     // jump to Rust code, should not return
     b       init
