@@ -16,6 +16,7 @@ use core::ptr;
 #[cfg(not(test))]
 #[no_mangle] // don't mangle the name of this function
 pub extern "C" fn main() -> () {
+    println!("Hello world!");
 	loop{};
 	// shutdown system
 	// shutdown();
