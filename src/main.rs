@@ -22,12 +22,17 @@ pub extern "C" fn main() -> () {
 		asm!{"movz x7, 0x41" :::: "volatile"};
 		asm!{"str x7, [x8]" :::: "volatile"};
 	;}
-	// write 'A' to qemu uart
+	// write 'A' to qemu uart;
 	// TODO: Find out, why ths isn't working...
-	// unsafe { ptr::write_volatile(0x09000000  as *mut u32, 65 as u32); }
-	loop{};
+	unsafe { ptr::write_volatile(0x09000000  as *mut u32, 67 as u32); }
+	// loop{};
+	foo();
 	// shutdown system
 	// shutdown();
+}
+
+pub fn foo() {
+	loop {	}
 }
 
 /// This function is called on panic.

@@ -37,8 +37,9 @@ _start:
     b       1b
 2:  // cpu id == 0
 
-    // set stack before our code
-    mov sp, 0x40000000
+    // init 1G stack stack in RAM area (>0x40000000 for qemu virt device)
+    movz x1, 0x5000, lsl 16
+    mov sp, x1
 
     // print 'B' to virt. uart
     movz x8, 0x900, lsl 16
