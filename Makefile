@@ -87,7 +87,7 @@ RUSTC := \
 		-Z no-landing-pads \
 		--out-dir $(installed_target_libs)
 
-.PHONY: runtimea
+.PHONY: runtime
 
 runtime: $(runtime_rlibs)
 

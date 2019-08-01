@@ -27,6 +27,8 @@
 
 .global _start
 
+// TODO: print message from boot? Error handler?
+
 _start:
     // read cpu id, stop slave cores
     mrs     x1, mpidr_el1
