@@ -1,4 +1,3 @@
-//! A wrapper around our serial console.
 // Copyright (c) 2017 Stefan Lankes, RWTH Aachen University
 //
 // MIT License
@@ -22,17 +21,20 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-use core::fmt;
-use spin::Mutex;
-use arch::serial;
+#![allow(dead_code)]
 
-pub struct Console;
+//! Configuration parameter of the kernel eduOS-rs
 
-impl fmt::Write for Console {
-	/// Output a string to each of our console outputs.
-	fn write_str(&mut self, s: &str) -> fmt::Result {
-		serial::COM1.lock().write_str(s)
-	}
-}
+/// Define the size of the kernel stack
+pub const KERNEL_STACK_SIZE : usize = 8192;
 
-pub static CONSOLE: Mutex<Console> = Mutex::new(Console);
+/// Define the maximum number of different tasks
+pub const MAX_TASKS : usize = 16;
+
+/// Size of a cache line on a x86_64 processor
+#[cfg(target_arch="x86_64")]
+pub const CACHE_LINE : usize = 64;
+
+/// Size of a page frame on a x86_64 processor
+#[cfg(target_arch="x86_64")]
+pub const PAGE_SIZE : usize = 4096;

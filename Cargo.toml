@@ -16,6 +16,11 @@ r0 = "0.2.2"
 git = "https://github.com/hermitcore/rust-x86.git"
 branch = "hermit"
 default-features = false
+rlibc = "1.0.0"	# Low-level functions like memcpy.
+raw-cpuid = "3.0.0"
+cpuio = "0.2.0"
+spin = "0.4.6"
+alloc_kernel = { path = "alloc_kernel" }
 
 [target.'cfg(target_arch = "aarch64")'.dependencies.aarch64]
 git = "https://github.com/Harry-R/rust-aarch64.git"
@@ -39,6 +44,10 @@ run-command = ["qemu-system-aarch64", "-drive", "format=raw,file={}"]
 [package.metadata.bootimage.bootloader]
 name = "bootloader"                 # The bootloader crate name
 target = "aarch64-bootloader.json"   # Target triple for compiling the bootloader
+
+# [dependencies.lazy_static]
+# version = "0.2.9"
+# features = ["spin_no_std"]
 
 # The development profile, used for `cargo build`.
 [profile.dev]

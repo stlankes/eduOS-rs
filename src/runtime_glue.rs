@@ -1,4 +1,3 @@
-//! A wrapper around our serial console.
 // Copyright (c) 2017 Stefan Lankes, RWTH Aachen University
 //
 // MIT License
@@ -22,17 +21,37 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-use core::fmt;
-use spin::Mutex;
-use arch::serial;
+//! Minor functions that Rust really expects to be defined by our compiler
+//! or something, but which we need to provide manually because we're on
+//! bare metal.
 
-pub struct Console;
+#![allow(private_no_mangle_fns)]
 
-impl fmt::Write for Console {
-	/// Output a string to each of our console outputs.
-	fn write_str(&mut self, s: &str) -> fmt::Result {
-		serial::COM1.lock().write_str(s)
+use arch;
+
+#[lang = "eh_personality"]
+extern "C" fn eh_personality() {
+}
+
+#[lang = "panic_fmt"] #[no_mangle]
+extern "C" fn panic_fmt(
+    args: ::core::fmt::Arguments, file: &str, line: usize)
+    -> !
+{
+    println!("PANIC: {}:{}: {}", file, line, args);
+
+	loop {
+		arch::processor::halt();
 	}
 }
 
-pub static CONSOLE: Mutex<Console> = Mutex::new(Console);
+#[no_mangle]
+#[allow(non_snake_case)]
+pub fn _Unwind_Resume()
+{
+    println!("UNWIND!");
+
+	loop {
+		arch::processor::halt();
+	}
+}
