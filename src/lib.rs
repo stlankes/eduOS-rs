@@ -1,9 +1,13 @@
 #![feature(asm, const_fn, lang_items, global_asm)]
+#![feature(allocator_api)]
+#![feature(compiler_builtins_lib)]
+#![feature(naked_functions)]
 #![no_std]
 
 extern crate spin;
 #[cfg(target_arch = "x86_64")]
 extern crate x86;
+extern crate alloc;
 
 #[cfg(target_arch = "aarch64")]
 extern crate aarch64;
@@ -17,5 +21,12 @@ pub use arch::processor::*;
 pub mod macros;
 #[macro_use]
 pub mod logging;
+pub mod consts;
 pub mod arch;
 pub mod console;
+pub mod mm;
+pub mod collections;
+pub mod scheduler;
+
+#[global_allocator]
+static ALLOCATOR: &'static mm::allocator::Allocator = &mm::allocator::Allocator;

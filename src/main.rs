@@ -10,14 +10,32 @@ extern crate eduos_rs;
 
 use core::panic::PanicInfo;
 use core::ptr;
-// use eduos_rs::arch::processor::shutdown;
+use eduos_rs::arch::processor::{shutdown,halt};
+use eduos_rs::scheduler;
+
+extern "C" fn foo() {
+	for _i in 0..5 {
+		println!("hello from task {}", scheduler::get_current_taskid());
+		scheduler::reschedule();
+	}
+}
 
 /// This is the main function called by `init()` function from boot.rs
 #[cfg(not(test))]
 #[no_mangle] // don't mangle the name of this function
-pub extern "C" fn main() -> () {
-    println!("Hello world!");
-	loop{};
+pub extern "C" fn main() -> ! {
+	scheduler::init();
+
+	println!("Hello from eduOS-rs!");
+
+	for _i in 0..2 {
+		scheduler::spawn(foo);
+	}
+
+	scheduler::reschedule();
+
+	println!("Shutdown system!");
+
 	// shutdown system
 	// shutdown();
 }
@@ -25,7 +43,6 @@ pub extern "C" fn main() -> () {
 /// This function is called on panic.
 #[cfg(not(test))]
 #[panic_handler]
-#[no_mangle]
 pub fn panic(info: &PanicInfo) -> ! {
 	print!("[!!!PANIC!!!] ");
 
@@ -39,5 +56,7 @@ pub fn panic(info: &PanicInfo) -> ! {
 
 	print!("\n");
 
-	loop {}
+	loop {
+		halt();
+	}
 }

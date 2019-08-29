@@ -12,6 +12,7 @@ r0 = "0.2.2"
 # bootimage = "0.6.6"
 # bootloader = "0.3.4"
 
+
 [target.'cfg(target_arch = "x86_64")'.dependencies.x86]
 git = "https://github.com/hermitcore/rust-x86.git"
 branch = "hermit"
@@ -42,7 +43,7 @@ target = "aarch64-bootloader.json"   # Target triple for compiling the bootloade
 
 # The development profile, used for `cargo build`.
 [profile.dev]
-opt-level = 0      # controls the `--opt-level` the compiler builds with
+opt-level = 1      # controls the `--opt-level` the compiler builds with
 debug = true       # controls whether the compiler passes `-C debuginfo`
                    # a value of `true` is equivalent to `2`
 rpath = false      # controls whether the compiler passes `-C rpath`
