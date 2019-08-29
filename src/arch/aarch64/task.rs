@@ -1,26 +1,10 @@
-// Copyright (c) 2017 Stefan Lankes, RWTH Aachen University
+// Copyright (c) 2017-2018 Stefan Lankes, RWTH Aachen University
 // Copyright (c) 2019 Leonard Rapp, RWTH Aachen University
 //
-// MIT License
-//
-// Permission is hereby granted, free of charge, to any person obtaining
-// a copy of this software and associated documentation files (the
-// "Software"), to deal in the Software without restriction, including
-// without limitation the rights to use, copy, modify, merge, publish,
-// distribute, sublicense, and/or sell copies of the Software, and to
-// permit persons to whom the Software is furnished to do so, subject to
-// the following conditions:
-//
-// The above copyright notice and this permission notice shall be
-// included in all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-// EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-// NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
-// LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
-// OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
-// WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+// Licensed under the Apache License, Version 2.0, <LICENSE-APACHE or
+// http://apache.org/licenses/LICENSE-2.0> or the MIT license <LICENSE-MIT or
+// http://opensource.org/licenses/MIT>, at your option. This file may not be
+// copied, modified, or distributed except according to those terms.
 
 //! Architecture dependent interface to initialize a task
 
@@ -28,7 +12,6 @@ use core::mem::size_of;
 use scheduler::task::*;
 use scheduler::{do_exit,get_current_taskid};
 use consts::*;
-use rlibc::*;
 use logging::*;
 
 #[derive(Debug)]
@@ -113,13 +96,13 @@ extern "C" fn leave_task() {
 }
 
 impl TaskFrame for Task {
-	// TODO: changes for aarch64
+	// TODO: further changes for aarch64
     fn create_stack_frame(&mut self, func: extern fn())
 	{
 		unsafe {
-			let mut stack: *mut u64 = (self.stack.top() - 16) as *mut u64;
+			let mut stack: *mut u64 = ((*self.stack).top()) as *mut u64;
 
-			memset(self.stack.bottom() as *mut u8, 0xCD, KERNEL_STACK_SIZE);
+			memset((*self.stack).bottom() as *mut u8, 0xCD, STACK_SIZE);
 
 			/* Only marker for debugging purposes, ... */
 			*stack = 0xDEADBEEFu64;
@@ -136,14 +119,14 @@ impl TaskFrame for Task {
 			let state: *mut State = stack as *mut State;
 			memset(state as *mut u8, 0x00, size_of::<State>());
 
-			(*state).rsp = (stack as usize + size_of::<State>()) as u64;
+			(*state).sp = (stack as usize + size_of::<State>()) as u64;
 			(*state).rbp = (*state).rsp + size_of::<u64>() as u64;
 
-			(*state).rip = (func as *const()) as u64;;
+			(*state).pc = (func as *const()) as u64;;
 			(*state).rflags = 0x1002u64;
 
 			/* Set the task's stack pointer entry to the stack we have crafted right now. */
-			self.last_stack_pointer =  stack as u64;
+			self.last_stack_pointer =  stack as usize;
 		}
 	}
 }
