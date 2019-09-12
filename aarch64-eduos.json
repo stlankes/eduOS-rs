@@ -8,7 +8,7 @@
     "os": "none",
     "executables": true,
     "linker-flavor": "ld.lld",
-    "linker": "rust-lld",
+    "linker": "lld-8",
     "panic-strategy": "abort",
     "disable-redzone": true,
     "features": "+a53,+strict-align,-fp-armv8",
