@@ -23,6 +23,12 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
+.section ".data"
+.global boot_stack
+.balign 0x10
+boot_stack: .skip 0x2000
+
 .section ".text.boot"
 
 .global _start
@@ -38,7 +44,8 @@ _start:
 2:  // cpu id == 0
 
     // init 1G stack stack in RAM area (>0x40000000 for qemu virt device)
-    movz x1, 0x5000, lsl 16
+    //movz x1, 0x5000, lsl 16
+    ldr x1, =(boot_stack+0x2000-0x10)
     mov sp, x1
 
     // jump to Rust code, should not return

@@ -9,7 +9,7 @@
 extern crate eduos_rs;
 
 use core::panic::PanicInfo;
-use core::ptr;
+// use core::ptr;
 // use eduos_rs::arch::processor::shutdown;
 
 /// This is the main function called by `init()` function from boot.rs

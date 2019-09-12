@@ -1,6 +1,5 @@
 use core::fmt;
-use spin::Mutex;
-use aarch64::io::*;
+use core::ptr::write_volatile;
 
 /// A COM serial port.
 pub struct ComPort {
@@ -23,11 +22,11 @@ impl fmt::Write for ComPort {
 		// Output each byte of our string.
 		for &b in s.as_bytes() {
 			// Write our byte.
-			write_byte(self.port_address, b);
+			unsafe { write_volatile(self.port_address as *mut u8, b); }
 		}
 		Ok(())
 	}
 }
 
 /// Our primary serial port.
-pub static COM1: Mutex<ComPort> = Mutex::new(ComPort::new(0x09000000));
+pub static mut COM1: ComPort = ComPort::new(0x800 /*0x09000000*/);

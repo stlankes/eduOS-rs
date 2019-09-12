@@ -1,7 +1,7 @@
 #![feature(asm, const_fn, lang_items, global_asm)]
 #![no_std]
 
-extern crate spin;
+//extern crate spin;
 #[cfg(target_arch = "x86_64")]
 extern crate x86;
 
